@@ -8,6 +8,7 @@
 
 #get sudo privileges
 sudo echo 
+python $HOME/bin/events/proxyman/ProxyMan.py
 
 #store FreeSWITCH and OpenBTS root locations
 OBTS_ROOT="$HOME/openbts"
@@ -34,8 +35,8 @@ sudo gnome-terminal --title "SMQUEUE_SIPAUTHSERVE" --tab --title "SMQUEUE" -e "s
 cd $OBTS_ROOT/public/openbts/trunk/apps
 sudo killall transceiver &> /tmp/tmp #sometimes necessary
 export mytitle=OpenBTS
-sudo gnome-terminal --title "OPENBTS" -x sh -c "sudo ./OpenBTS" &
 sudo gnome-terminal --title "OPENBTS_CLI" -x sh -c  "sudo ./OpenBTSCLI" &
 
-twinkle &
+sudo gnome-terminal --title "OPENBTS" -x sh -c "while true; do sudo ./OpenBTS && break; done" &
 
+linphone &

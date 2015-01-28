@@ -1,0 +1,547 @@
+; This dialplan is specially designed for use with OpenBTS.
+; http://gnuradio.microembedded.com/openbtsasteriskscript
+; It can also be used as an Asterisk based solution without using mobile phones.
+; It provides full hotdesking for all phones registered and configured with sip entry in
+; /etc/asterisk/sip.conf
+;
+; SIP entries in /etc/asterisk/sip.conf
+; SIP entries in sip.conf has to look like this:
+;
+; [IMSI204123170034543]
+; callerid=IMSI204123170034543 <IMSI204123170034543>
+; canreinvite=no
+; type=friend
+; allow=gsm
+; context=sip-internal
+; host=dynamic
+;
+; Be aware of the fact that with SIP entries as above smqueue will not work properly.
+;
+; Automatic configuration of discovered IMSI numbers should be easy
+; Because no dialplan info has to be added, automatic configuration of a SIP entry after
+; discovering should not be that hard. The use of a file for every SIP entry included
+; in SIP.conf is the way to go for this.
+;
+;*Simple, safe and flexible dialplan*
+; This dialplan provides flexibility and seperates the SIP registration based on IMSI
+; number and the actual phone numbers used to call.
+;
+; The basic idea behind this dial plan is to keep it as simple, safe and flexible
+; as possible. It can be used as a ready to go solution but it might be
+; a good idea to make some adjustments based on particular needs.
+;
+;*Number range 1001 - 1012 preconfigured*
+; The number 1001 to 1012 are preconfigured. Expanding the number range is
+; just a matter of copy and past of all the 1001 to 1012 parts in the dialplan and make some
+; adjustments on the numbers. The dialplan should suite every OpenBTS deployment.
+;
+;*Logging in*
+; When a mobile phone is registered to OpenBTS and Asterisk it needs
+; to be logged in for a phone number. This is done by dialing 0<phone number>.
+; Dialing 01001 makes the phone reachable at number 1001 and set the callerid
+; to 1001. By default the pincode is 1234 but this can easily be changed.
+; One phone can log in an unlimited number of phonenumbers. The limitation is
+; the the range of numbers available within the dialplan.
+;
+;*Logging off*
+; Dial 1<phonenumber> to log out of a phone umber. The result of dialing 11001 is that
+; the phone is no longer reachable at number 1001
+;
+;*Automatic log off*
+; A phone number will be logged off if a call is made to that number and the status is
+; UNAVAILABLE.
+;
+;*Logging in is needed to make useful calls*
+; A phone registered to the OpenBTS and Asterisk but not logged to a phonenumber
+; can't make any usefull phonecalls. Any dialed number is routed to an Asterisk
+; music on hold extensions or the monkeys screaming. This can be changed to personal
+; needs like a voiceprompt that let the caller know that a login to a number is needed.
+; This provides security to this solution. You need to have the proper credentials to make
+; phonecalls.
+;
+;*Using a trunk*
+; The dialplan is ready for use with a trunk so outbound calls can be made if the connection
+; is actually there. In the dialplan all numbers of 10 positions are routed to the trunk.
+; In the Netherlands this enables making national phonecalls. A phone needs to be logged into
+; a phone number before an outbound call can be made. The numbermatching ca be changed to your needs.
+; OPENBTS_TRUNK is the global variable to store the trunk.
+;
+;*Special numbers*
+; Some special numbers, handy when testing, have been added to the dialplan:
+; 01234 -> releases all logged in numbers. be aware that if you call this number and enter
+; the password (default 1234) all phones are without an actual number.
+; 02345 -> shows all phonenumbers and, if available, the IMSI number related to the phonenumber
+; in the Asterisk Cli.
+; 03456 -> shows the device state of the SIP registered IMSI numbers in the Asterisk Cli.
+; This doesn't work at the moment while it should :-(
+; 02000 -> a music on hold extension.
+;
+; Absolute timeout
+; Set(Timeout(absolute)=XX) is used now and then so calls without the proper credentials
+; end within a certain time. XX is the number of seconds before the connection will be ended.
+;
+; 4 different scenarios for a call
+; Different things can happen when dialing a number, depending on the status of the phone used and the
+; status of the number called. Info about the actual status can be viewed from the Asterisk Cli with verbose
+; set to 5 (set verbose 5)
+;
+; scenario 1
+; The phone used to dial a number hasn't been logged in. It is not possible
+; to make any call without first logging in with a proper combination of number and password/pincode
+;
+; scenario 2
+; The phone has been logged in properly but the number dialed isn't logged in
+;
+; scenario 3
+; The phone has been logged in properly, the number dialed is logged in but the phone is switch off
+; or out of range. When this happens the dialed number is logged off. Because OpenBTS does return a SIP code
+; that Asterisk doesn't translate in a CHANUNAVAIL but in a NOANSWER dialstatus the handling of this status doesn't
+; work properly. This isn't a real problem because the phone isn'r reachable anyway. The result is that the login
+; stays in place despite the fact that the phone is turned off or out of reach.
+;
+; scenario 4
+; The phone has been logged in properly and the number dialed has been logged in properly. the dialed phone will
+; ring and probably be picked up ;-)
+;
+; When a trunk is configured the phone used to dial an outbound number has to be properly logged into
+; The global variable OPENBTS_TRUNK is used to store the actual trunk.
+;
+;*How to install this dialplan?*
+; Just do a select all of this wiki text and do a paste in an empty file. Save this file as /etc/asterisk/extensions.conf
+; add some sip entries like the example at the beginning of this text to /etc/asteisk/sip.conf and do a reload.
+; Now you are ready to go ;-)
+;
+; Hope it is useful and you will have lots of fun!
+;
+;
+;Erik
+;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; auteur : Erik de Wild
+; company : Tripple-o : Your Asterisk migration partner
+; e-mail : info at tripple-o.nl
+; phone : 0031621830837
+;
+; Rights : Tripple-o owns the rights to this dialplan
+; Country : the Netherlands
+; Time Zone : GMT +1
+;
+; version : 1.0
+; date : 24 december 2009
+; License : This dialplan is GPL3 licensed with the condition that
+; this header (from top to [global]) is kept in place, credits are addressed and you don't charge
+; money for the dialplan as it is. Under this conditions you are allowed to use, change and
+; redistribute it.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+[globals]
+OPENBTS_TRUNK => SIP/31208123456
+; variables for the IMSI numbers
+;;;;;;;;;;;;;;;
+; Here you can couple a phone to a number used in a sip entry in sip.conf. Used with
+; OpenBTS this is the IMSI.
+;
+; Be aware of the fact that a reload will also reset the values of the NR<NUMBER> variables.
+; during testing and trying this might be usefull, but in production this will lead to
+; a lot of confusing because of lost logins.
+;
+; Number 1001 is used to show how a static link between a phone number and the callerid defined in a sip entry can be established.
+; This is just an example for further adjustments to your personal needs
+;;;;;;;;;;;;;;;
+;;;;;;;;;;;;
+; Number 1001 is an example of how to change a hotdesk phonenumber into a static phonenumber.
+; This can be done with every phonenumber available. Be sure to make all the adjustments
+; needed. Logging in, logging off, automatic logging of if dialstatus is CHANUNAVAIL, logging
+; off of all the numbers by calling 01234 and enter pincode.
+;;;;;;;;;;;;
+NR1001 => STATIC0000001 ; This will, in combination with some other adjustments, change 1001 in a static number
+;NR1002 =>
+;NR1003 =>
+;NR1004 =>
+;NR1005 =>
+;NR1006 =>
+;NR1007 =>
+;NR1008 =>
+;NR1009 =>
+;NR1010 =>
+;NR1011 =>
+;NR1012 =>
+[default]
+[trunk]
+exten => s,1,GotoIf($${NR1001}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1002}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1003}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1004}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1005}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1006}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1007}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1008}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1009}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1010}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1011}" = "${CALLERID}?CONTINUE)
+exten => s,n,GotoIf($${NR1012}" = "${CALLERID}?CONTINUE)
+exten => s,n,Answer()
+exten => s,n,NoOp(The phone used to make an outbound call has not been logged into with proper credentials so no calls can be made.)
+exten => s,n,Set(TIMEOUT=15) ; this is to assure that the line is released after 15 seconds
+exten => s,n,MusicOnHold()
+; MOH has to be replaced by some usefull voiceprompt like "sorry, you are not allowed to make
+; outbound calls until you log in"
+exten => s,n,NoOp(The trunk used for this outboundcall is ${OPENBTS_TRUNK})
+exten => s,n(CONTINUE),Dial(${OPENBTS_TRUNK}/${CALLED_NUMBER},40,rt)
+exten => s,n,Hangup()
+exten => _31208080651,1,Dial(SIP/IMSI204203000434438,40,t)
+exten => _31208080651,n,Hangup()
+[sip-internal]
+exten => _XXXX,1,Set(CALLED_NUMBER=${EXTEN})
+exten => _XXXX,n,Goto(dialplan,start,1)
+exten => _0XXXXXXXXX,1,Set(CALLED_NUMBER=${EXTEN})
+exten => _0XXXXXXXXX,n,Goto(trunk,s,1)
+exten => _0XXXX,1,Set(CALLED_NUMBER=${EXTEN})
+exten => _0XXXX,n,Goto(dialplan,${EXTEN},1)
+exten => _1XXXX,1,Set(CALLED_NUMBER=${EXTEN})
+exten => _1XXXX,n,Goto(dialplan,${EXTEN},1)
+
+exten => _87X,1,NoOp()
+exten => _87X,n,MixMonitor(${UNIQUEID}.wav,ab)
+exten => _87X,n,Dial(SIP/${EXTEN},45)
+exten => _87X,n,StopMixMonitor()
+exten => _87X,n,Hangup()
+	
+[dialplan]
+include => trunk
+exten => start,1,GotoIf($${NR1001}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1002}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1003}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1004}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1005}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1006}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1007}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1008}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1009}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1010}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1011}" = "${CALLERID}?CONTINUE)
+exten => start,n,GotoIf($${NR1012}" = "${CALLERID}?CONTINUE)
+exten => start,n,NoOp(Phone used to make a phonecall is not logged in yet)
+exten => start,n,Answer()
+exten => start,n,Set(TIMEOUT=15) ; this is to assure that the line is released
+; after 15 seconds
+exten => start,n,MusicOnHold() ; has to be changed in a voiceprompt inviting to
+; login to one of the numbers
+exten => start,n(CONTINUE),Goto(00${CALLED_NUMBER},1)
+exten => 001001,1,Macro(dialGSM,${NR1001},${CALLED_NUMBER})
+exten => 001002,1,Macro(dialGSM,${NR1002},${CALLED_NUMBER})
+exten => 001003,1,Macro(dialGSM,${NR1003},${CALLED_NUMBER})
+exten => 001004,1,Macro(dialGSM,${NR1004},${CALLED_NUMBER})
+exten => 001005,1,Macro(dialGSM,${NR1005},${CALLED_NUMBER})
+exten => 001006,1,Macro(dialGSM,${NR1006},${CALLED_NUMBER})
+exten => 001007,1,Macro(dialGSM,${NR1007},${CALLED_NUMBER})
+exten => 001008,1,Macro(dialGSM,${NR1008},${CALLED_NUMBER})
+exten => 001009,1,Macro(dialGSM,${NR1009},${CALLED_NUMBER})
+exten => 001010,1,Macro(dialGSM,${NR1010},${CALLED_NUMBER})
+exten => 001011,1,Macro(dialGSM,${NR1011},${CALLED_NUMBER})
+exten => 001012,1,Macro(dialGSM,${NR1012},${CALLED_NUMBER})
+exten => _00XXXX,1,NoOp(A non existing number has been dialed)
+exten => _00XXXX,n,PlayBack(silence/3)
+exten => _00XXXX,n,PlayBack(tt-monkeys)
+exten => _00XXXX,n,Hangup()
+exten => 02000,1,Answer
+exten => 02000,n,MusicOnHold()
+exten => 02000,n,Hangup()
+;;;;;;;;;;;;
+; clearing the values of all variables so you can start all over again
+;;;;;;;;;;;;
+exten => 01234,1,Answer()
+exten => 01234,n,Background(silence/3)
+exten => 01234,n,Authenticate(1234)
+; exten => 01234,n,Set(GLOBAL=) ; should stay untouched because 1001 is a static number
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Set(GLOBAL=)
+exten => 01234,n,Hangup()
+;;;;;;;;;;;;;;
+; this routine shows the values of the NR<XXXX> variables on screen of the Asterisk CLI when verbose is above 5
+;;;;;;;;;;;;;
+exten => 02345,1,Answer()
+exten => 02345,n,NoOp(The value of NR1001 is: ${NR1001})
+exten => 02345,n,NoOp(The value of NR1002 is: ${NR1002})
+exten => 02345,n,NoOp(The value of NR1003 is: ${NR1003})
+exten => 02345,n,NoOp(The value of NR1004 is: ${NR1004})
+exten => 02345,n,NoOp(The value of NR1005 is: ${NR1005})
+exten => 02345,n,NoOp(The value of NR1006 is: ${NR1006})
+exten => 02345,n,NoOp(The value of NR1007 is: ${NR1007})
+exten => 02345,n,NoOp(The value of NR1008 is: ${NR1008})
+exten => 02345,n,NoOp(The value of NR1009 is: ${NR1009})
+exten => 02345,n,NoOp(The value of NR1010 is: ${NR1010})
+exten => 02345,n,NoOp(The value of NR1011 is: ${NR1011})
+exten => 02345,n,NoOp(The value of NR1012 is: ${NR1012})
+exten => 02345,n,Hangup()
+exten => 03456,1,Answer()
+exten => 03456,n,NoOP(The status of ZOIPER is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1001} attached to 1001 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1002} attached to 1002 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1003} attached to 1003 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1004} attached to 1004 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1005} attached to 1005 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1006} attached to 1006 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1007} attached to 1007 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1008} attached to 1008 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1009} attached to 1009 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1010} attached to 1010 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1011} attached to 1011 is ${DEVSTATE})
+exten => 03456,n,NoOP(The status of ${NR1012} attached to 1012 is ${DEVSTATE})
+;;;;;;;;;;;;;;;;
+; this actually links phonenumber to an IMSI number
+;;;;;;;;;;;;;;;;
+; commented because no log in to number 1001 is needed
+;;;;;;;;;;;;;;;;
+;exten => 01001,1,Answer()
+;exten => 01001,n,Background(silence/3)
+;exten => 01001,n,Authenticate(1234)
+;exten => 01001,n,Set(GLOBAL=${CALLERID})
+;exten => 01001,n,Hangup()
+exten => 01002,1,Answer()
+exten => 01002,n,Background(silence/3)
+exten => 01002,n,Authenticate(1234)
+exten => 01002,n,Set(GLOBAL=${CALLERID})
+exten => 01002,n,Hangup()
+exten => 01003,1,Answer()
+exten => 01003,n,Background(silence/3)
+exten => 01003,n,Authenticate(1234)
+exten => 01003,n,Set(GLOBAL=${CALLERID})
+exten => 01003,n,Hangup()
+exten => 01004,1,Answer()
+exten => 01004,n,Background(silence/3)
+exten => 01004,n,Authenticate(1234)
+exten => 01004,n,Set(GLOBAL=${CALLERID})
+exten => 01004,n,Hangup()
+exten => 01005,1,Answer()
+exten => 01005,n,Background(silence/3)
+exten => 01005,n,Authenticate(1234)
+exten => 01005,n,Set(GLOBAL=${CALLERID})
+exten => 01005,n,Hangup()
+exten => 01006,1,Answer()
+exten => 01006,n,Background(silence/3)
+exten => 01006,n,Authenticate(1234)
+exten => 01006,n,Set(GLOBAL=${CALLERID})
+exten => 01006,n,Hangup()
+exten => 01007,1,Answer()
+exten => 01007,n,Background(silence/3)
+exten => 01007,n,Authenticate(1234)
+exten => 01007,n,Set(GLOBAL=${CALLERID})
+exten => 01007,n,Hangup()
+exten => 01008,1,Answer()
+exten => 01008,n,Background(silence/3)
+exten => 01008,n,Authenticate(1234)
+exten => 01008,n,Set(GLOBAL=${CALLERID})
+exten => 01008,n,Hangup()
+exten => 01009,1,Answer()
+exten => 01009,n,Background(silence/3)
+exten => 01009,n,Authenticate(1234)
+exten => 01009,n,Set(GLOBAL=${CALLERID})
+exten => 01009,n,Hangup()
+exten => 01010,1,Answer()
+exten => 01010,n,Background(silence/3)
+exten => 01010,n,Authenticate(1234)
+exten => 01010,n,Set(GLOBAL=${CALLERID})
+exten => 01010,n,Hangup()
+exten => 01011,1,Answer()
+exten => 01011,n,Background(silence/3)
+exten => 01011,n,Authenticate(1234)
+exten => 01011,n,Set(GLOBAL=${CALLERID})
+exten => 01011,n,Hangup()
+exten => 01012,1,Answer()
+exten => 01012,n,Background(silence/3)
+exten => 01012,n,Authenticate(1234)
+exten => 01012,n,Set(GLOBAL=${CALLERID})
+exten => 01012,n,Hangup()
+;;;;;;;;;;;;;;;;;;;;;
+; this removes the link between a phone number and an IMSI number
+;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;
+; commented out because loging off is not needed with a static number
+;;;;;;;;;;;;;;;
+;exten => 11001,1,Answer()
+;exten => 11001,n,Set(GLOBAL=)
+;exten => 11001,n,Goto(beep,1)
+exten => 11002,1,Answer()
+exten => 11002,n,Set(GLOBAL=)
+exten => 11002,n,Goto(beep,1)
+exten => 11003,1,Answer()
+exten => 11003,n,Set(GLOBAL=)
+exten => 11003,n,Goto(beep,1)
+exten => 11004,1,Answer()
+exten => 11004,n,Set(GLOBAL=)
+exten => 11004,n,Goto(beep,1)
+exten => 11005,1,Answer()
+exten => 11005,n,Set(GLOBAL=)
+exten => 11005,n,Goto(beep,1)
+exten => 11006,1,Answer()
+exten => 11006,n,Set(GLOBAL=)
+exten => 11006,n,Goto(beep,1)
+exten => 11007,1,Answer()
+exten => 11007,n,Set(GLOBAL=)
+exten => 11007,n,Goto(beep,1)
+exten => 11008,1,Answer()
+exten => 11008,n,Set(GLOBAL=)
+exten => 11008,n,Goto(beep,1)
+exten => 11009,1,Answer()
+exten => 11009,n,Set(GLOBAL=)
+exten => 11009,n,Goto(beep,1)
+exten => 11010,1,Answer()
+exten => 11010,n,Set(GLOBAL=)
+exten => 11010,n,Goto(beep,1)
+exten => 11011,1,Answer()
+exten => 11011,n,Set(GLOBAL=)
+exten => 11011,n,Goto(beep,1)
+exten => 11012,1,Answer()
+exten => 11012,n,Set(GLOBAL=)
+exten => 11012,n,Goto(beep,1)
+;;;;;;;;;;;
+; just some useless noice
+;;;;;;;;;;;
+exten => beep,1,Background(silence/2)
+exten => beep,n,PlayBack(beep)
+exten => beep,n,PlayBack(beep)
+exten => beep,n,PlayBack(beep)
+exten => beep,n,PlayBack(beep)
+exten => beep,n,PlayBack(beep)
+exten => beep,n,Hangup()
+[macro-dialGSM]
+;;;;;;;;;;;;;
+; check all NR<number> variables to determine what phone number is used to call,
+; so there is proper value for ${CALLERID}
+;;;;;;;;;;;;;
+exten => s,1,GotoIf($${NR1001}" = "${CALLERID}?NR1001)
+exten => s,n,GotoIf($${NR1002}" = "${CALLERID}?NR1002)
+exten => s,n,GotoIf($${NR1003}" = "${CALLERID}?NR1003)
+exten => s,n,GotoIf($${NR1004}" = "${CALLERID}?NR1004)
+exten => s,n,GotoIf($${NR1005}" = "${CALLERID}?NR1005)
+exten => s,n,GotoIf($${NR1006}" = "${CALLERID}?NR1006)
+exten => s,n,GotoIf($${NR1007}" = "${CALLERID}?NR1007)
+exten => s,n,GotoIf($${NR1008}" = "${CALLERID}?NR1008)
+exten => s,n,GotoIf($${NR1009}" = "${CALLERID}?NR1009)
+exten => s,n,GotoIf($${NR1010}" = "${CALLERID}?NR1010)
+exten => s,n,GotoIf($${NR1011}" = "${CALLERID}?NR1011)
+exten => s,n,GotoIf($${NR1012}" = "${CALLERID}?NR1012:NOT_LOGGED_IN)
+;;;;;;;;;;;;;;;;
+; you have to add call-limit=1 to the sip entries for the gsm phones
+; to make DEVSTATE (asterisk 1.4) or DEVICE_STATE (asterisk 1.6) work
+; The result is that when a phone is busy the dialstatus
+; returned by Asterisk is CHANUNAVAIL instead of BUSY. This is the reason why
+; (for now) the automatic log off in case of dialstatus is disabled
+; edw 29 december 2009
+;;;;;;;;;;;;;;;;
+exten => s,n(NR1001),Set(CALLERID=1001)
+exten => s,n,Set(CALLERID=1001)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1002),Set(CALLERID=1002)
+exten => s,n,Set(CALLERID=1002)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1003),Set(CALLERID=1003)
+exten => s,n,Set(CALLERID=1003)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1004),Set(CALLERID=1004)
+exten => s,n,Set(CALLERID=1004)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1005),Set(CALLERID=1005)
+exten => s,n,Set(CALLERID=1005)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1006),Set(CALLERID=1006)
+exten => s,n,Set(CALLERID=1006)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1007),Set(CALLERID=1007)
+exten => s,n,Set(CALLERID=1007)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1008),Set(CALLERID=1008)
+exten => s,n,Set(CALLERID=1008)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1009),Set(CALLERID=1009)
+exten => s,n,Set(CALLERID=1009)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1010),Set(CALLERID=1010)
+exten => s,n,Set(CALLERID=1010)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1011),Set(CALLERID=1011)
+exten => s,n,Set(CALLERID=1011)
+exten => s,n,Goto(CONTINUE)
+exten => s,n(NR1012),Set(CALLERID=1012)
+exten => s,n,Set(CALLERID=1012)
+exten => s,n,Goto(CONTINUE)
+exten => s,n,(NOT_LOGGED_IN),NoOp(The phone that is used to make a call is not logged into with proper credentials)
+exten => s,n,Set(TIMEOUT=15)
+exten => s,n,PlayBack(silence/2)
+exten => s,n,MusicOnHold()
+exten => s,n,Hangup()
+exten => s,n(CONTINUE),Set(STOP=0) ; just a variable to hold the value zero
+exten => s,n,NoOp(${LEN}) ; handy as cli output
+exten => s,n,GotoIf($${LEN}" = "${STOP}?STOPCALL) ; If no IMSI code is stored into NR<NUMBER> variable
+; and for that reason the variable is empty stop, otherwise
+; dial the number.
+exten => s,n,NoOp(the call is actually set up and all checks are passed)
+exten => s,n,Set(TIMEOUT=300) ; set length of call to the max of 5 minutes 300 seconds
+exten => s,n,Dial(SIP/${ARG1},20,rt)
+exten => s,n,Goto(s-${DIALSTATUS},1)
+exten => s,n(STOPCALL),NoOp(The number dialed is not logged in and for that reason not reachable)
+exten => s,n,playback(silence/2)
+exten => s,n,Set(TIMEOUT=15)
+exten => s,n,Answer()
+exten => s,n,MusicOnHold()
+exten => s,n,Hangup()
+exten => s-CANCEL,1,Hangup()
+exten => s-NOANSWER,1,Hangup()
+exten => s-BUSY,1,Busy(30)
+;;;;;;
+; add the handling as you would like it
+;;;;;;
+exten => s-BUSY,n,Hangup()
+exten => s-CONGESTION,1,Congestion(10)
+exten => s-CONGESTION,n,NoOp(call routed to congestion extension)
+exten => s-CONGESTION,n,Goto(s-CHANUNAVAIL,1)
+exten => s-CONGESTION,n,Hangup()
+exten => s-CHANUNAVAIL,1,NoOp(The phone number called is logged in but the phone is turned off or out of range)
+exten => s-CHANUNAVAIL,n,playback(silence/2)
+exten => s-CHANUNAVAIL,n,playback(ss-noservice)
+exten => s-CHANUNAVAIL,n,Goto(s-${ARG2},1)
+;;;;;;
+; if phonenumber is not available the value of NR<XXXX> variable will be erased
+; so the relation between a phonenumber and an IMSI number ends
+; This is disabled because of the returned dialstatus (CHANUNAVAIL) when call-limit+1 is reached
+; The return value should be BUSY
+;;;;;;
+; comented out because 1001 is static number
+;;;;;;
+;exten => s-1001,1,NoOp(SET=)
+;exten => s-1001,n,Hangup()
+exten => s-1002,1,NoOp(SET=))
+exten => s-1002,n,Hangup()
+exten => s-1003,1,NoOp(SET=))
+exten => s-1003,n,Hangup()
+exten => s-1004,1,NoOp(SET=))
+exten => s-1004,n,Hangup()
+exten => s-1005,1,NoOp(SET=))
+exten => s-1005,n,Hangup()
+exten => s-1006,1,NoOp(SET=))
+exten => s-1006,n,Hangup()
+exten => s-1007,1,NoOp(SET=))
+exten => s-1007,n,Hangup()
+exten => s-1008,1,NoOp(SET=))
+exten => s-1008,n,Hangup()
+exten => s-1009,1,NoOp(SET=))
+exten => s-1009,n,Hangup()
+exten => s-1010,1,NoOp(SET=))
+exten => s-1010,n,Hangup()
+exten => s-1011,1,NoOp(SET=))
+exten => s-1011,n,Hangup()
+exten => s-1012,1,NoOp(SET=))
+exten => s-1012,n,Hangup()
+
+exten => sms,1,Verbose(Incoming SMS from ${CALLERID(num)} ${BASE64_DECODE(${SMS_BASE64})})
+same  => n,System(echo ‘${STRFTIME(${EPOCH},,%Y-%m-%d %H:%M:%S)} – ${DONGLENAME} – ${CALLERID(num)}: ${BASE64_DECODE(${SMS_BASE64})}’ >> /var/log/asterisk/sms.txt)
+same  => n,Hangup()
