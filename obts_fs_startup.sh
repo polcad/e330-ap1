@@ -39,4 +39,4 @@ sudo gnome-terminal --title "OPENBTS_CLI" -x sh -c  "sudo ./OpenBTSCLI" &
 
 sudo gnome-terminal --title "OPENBTS" -x sh -c "while true; do sudo ./OpenBTS && break; done" &
 
-linphone &
+#linphone &
