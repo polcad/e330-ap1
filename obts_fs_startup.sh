@@ -1,10 +1,7 @@
 #!/bin/bash
 #2015-01-03 rev0.2
 #Version 0.20
-#Written by Amil Khanzada (http://AmilKhanzada.com/)
-#This script is released as is. Use at your own risk.
-#Released to public domain
-#See https://wush.net/trac/rangepublic/wiki/StartupScripts
+
 
 #get sudo privileges
 sudo echo 
