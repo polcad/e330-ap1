@@ -35,25 +35,24 @@ def help():
     """
     Vypis navodu k pouziti skriptu
     """
-    print("\nPopis:")
-    print("   Skript slouzi ke konfiguraci OpenBTS. Konfigurace je ulozena")
-    print("   v databazi sqlite. ")
-    print("   Umisteni databaze /etc/OpenBTS/OpenBTS.db")
+    print("\nDescription:")
+    print("   Script is used to manage the OpenBTS configuration database.")
+    print("   located usually in /etc/OpenBTS/OpenBTS.db")
     print("\nPouziti:")
-    print("   Vypis parametru z databze. Vsechny zaznamy nebo jeden konkretni")
+    print("   To display all config keys, or a specific key:")
     print("      openbtsconf.py show all")
     print("      openbtsconf.py show <KEYSTRING>\n")
-    print("   Nastaveni zaznamu")   
+    print("   To set a key value:")   
     print("      openbtsconf.py set <KEYSTRING> <VALUESTRING>\n")
-    print("Vice informaci na webu:")
+    print("More imformation:")
     print("   http://docs.imatte.cz/temata/konvergence-openims-openbts\n")
  
 def main():
-    # Cesta k databazi (/etc/OpenBTS/OpenBTS.db)
+    # Default location of OpenBTS config database (/etc/OpenBTS/OpenBTS.db)
     db_path = "/etc/OpenBTS/OpenBTS.db"
     conn = sqlite3.connect(db_path)
     c = conn.cursor()   
-     
+    print "Database: ", db_path
     options, args = getopt.getopt(sys.argv[1:], "")
      
     if(len(args) == 0):

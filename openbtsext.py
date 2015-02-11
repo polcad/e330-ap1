@@ -89,7 +89,7 @@ def help():
     Vypis navodu k pouziti skriptu
     """
     print("\nDescription:")
-    print("   Scripts are used to manage the database, which uses OpenBTS")
+    print("   Script is used to manage the database, which uses OpenBTS")
     print("   to map VoIP extension to dial extension")
     print("   Database located in: /var/lib/asterisk/sqlite3dir/sqlite3.db")
     print("\nUsing the script:")
@@ -107,6 +107,7 @@ def main():
     # Database path (/var/lib/asterisk/sqlite3dir/sqlite3.db)
     db_path = "sqlite3.db"
     db_path = "/var/lib/asterisk/sqlite3dir/sqlite3.db"
+    print "Database: ", db_path
     conn = sqlite3.connect(db_path)
     c = conn.cursor()   
      
