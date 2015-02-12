@@ -10,7 +10,7 @@ KEY=''
     echo "//---------------------------------------------------------------->"
 
     #MNCs=$(source MNCS.txt)
-    MNCs=(06 06)
+    MNCs=(01 02 03 04 05 06 07 08 09 10 11)
     TXTS=(
     "State Spying Reform 2014-A6. Embrace Our Transparency."
     "NSA Thanks You For Use Of Your Device"
