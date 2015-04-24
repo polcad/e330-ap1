@@ -45,15 +45,19 @@ def show(conn, c, args):
         item = c.fetchone()
         print("%s=%s\nComment:%s" %(item[0], item[1], item[4]))
 
-def set(conn, c, param, value):
+def set(conn, c, value, param):
 	if(param == "cellid"):
-		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.MCC'"""%(232))
-		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.MNC'"""%(value))
-		print("Setting\nMCC = 232")
-		print("MNC = %s"%(value))
+		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.MCC'"""%(value[0]))
+		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.MNC'"""%(value[1]))
+		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.LAC'"""%(value[2]))
+		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.CI'"""%(value[3]))
+		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.ShortName'"""%(value[4]))
+		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='GSM.Identity.C0'"""%(value[5]))
+		items=['set','cellid']
+		show(conn, c, items)
 	else:
 		c.execute("""UPDATE CONFIG set VALUESTRING='%s' WHERE KEYSTRING='%s'"""%(value, param))
-		print("Setting\n%s=%s"%(param, value))
+		print("Setting: %s=%s"%(param, value))
  
 def help():
     print("\nDescription:")
@@ -65,20 +69,22 @@ def help():
     print("      openbtsconf.py show cellid")
     print("      openbtsconf.py show <KEYSTRING>\n")
     print("   To set a key value:")
-    print("      openbtsconf.py set cellid <VALUESTRING>\n")   
+    print("      openbtsconf.py set cellid <MCC MNC LAC CI ShortName ARFCN>\n")   
+    print("      i.e. openbtsconf.py set cellid 232 01 17161 12 A1 58\n")
     print("      openbtsconf.py set <KEYSTRING> <VALUESTRING>\n")
+    print("      i.e. openbtsconf.py set C0 58\n")
     print("More imformation:")
     print("   http://docs.imatte.cz/temata/konvergence-openims-openbts\n")
     print(""
 	"Austria\n"
 	"MCC 	MNC 	Network 		Operator or brand name 	Status\n"
-	"232 	1   	A1 Telekom Austria 	A1 			Operational\n"
-	"232 	2   	A1 Telekom Austria 	A1 			Operational\n"
-	"232 	3   	T-Mobile 		T-Mobile 		Operational\n"
-	"232 	5   	Orange 			Orange 			Operational\n"
-	"232 	6   				Orange 			Operational\n"
-	"232 	7   	tele.ring 		Tele.ring 		Operational\n"
-	"232 	9   	A1 Telekom Austria 	A1 			Operational\n"
+	"232 	01   	A1 Telekom Austria 	A1 			Operational\n"
+	"232 	02   	A1 Telekom Austria 	A1 			Operational\n"
+	"232 	03   	T-Mobile 		T-Mobile 		Operational\n"
+	"232 	05   	Orange 			Orange 			Operational\n"
+	"232 	06   				Orange 			Operational\n"
+	"232 	07   	tele.ring 		Tele.ring 		Operational\n"
+	"232 	09   	A1 Telekom Austria 	A1 			Operational\n"
 	"232 	10   	Hutchison 3G Austria 	3 (Drei) 		Operational\n"
 	"232 	11   	A1 Telekom Austria 	Bob 			Operational\n"
 	"232 	12   	Yesss (Orange) 		Yesss 			Operational\n"
@@ -93,15 +99,27 @@ def main():
     c = conn.cursor()   
     print "Database: ", db_path
     options, args = getopt.getopt(sys.argv[1:], "")
-     
+
     if(len(args) == 0):
         help()
     elif(args[0] == "help"):
         help()
-    elif(args[0] == "set" and len(args) == 3):
-        param = args[1]
-        value = args[2]
-        set(conn, c, param, value)
+    elif(args[0] == "set" and len(args) >= 3):
+        if(args[1] == "cellid"):
+			param = args[1]
+			value = args[2:]
+			if(len(value)!=6):
+				print("You must specify all: MCC MNC LAC CI ShortName ARFCN")
+			elif(len(value[0])!=3):
+				print("ERROR: MCC must be 3 digits long")
+			elif(len(value[1])!=2):
+				print("ERROR: MNC must be 2 digits long")
+			else:
+				set(conn, c, value, param)
+        else:
+			param = args[1]
+			value = args[2]
+			set(conn, c, value, param)
     elif(args[0] == "show" and len(args) == 2):
         show(conn, c, args)
     else:

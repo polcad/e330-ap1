@@ -4,9 +4,6 @@ Scripts are used for inserting, deleting, and displaying data from database
 SQlite /var/lib/asterisk/sqlite3dir/sqlite3.db,
 which contains a mapping of VoIP extensions to the caller id
  
-Marcel Fajkus
-28.11.2014, v1.0
- 
 """
 import sys
 import sqlite3, getopt
@@ -61,12 +58,12 @@ def show(conn, c, args):
     Display data from tables: dialdata_table, sip_buddies
     """
     if(args[1] == "all"):
-        """Vypis vsech zaznamu v databazi"""
-        c.execute("""SELECT D.id, D.exten, D.dial, S.context
+        """Display all records from dialdata_table and sip_buddies tables"""
+        c.execute("""SELECT D.id, D.exten, D.dial, S.hardware, S.context
                     FROM dialdata_table D, sip_buddies S WHERE D.id=S.id""")
         for item in c.fetchall():
-            print("ID(%s) exten=<%s> dial=%s context=<%s>"
-                  %(item[0], item[1], item[2], item[3]))       
+            print("ID(%s) exten=<%s> dial=%s Hardware=<%s> context=<%s>"
+                  %(item[0], item[1], item[2], item[3], item[4]))       
     else:
         """A listing of all records in the database"""
         c.execute("""SELECT D.id, D.exten, D.dial, S.context
@@ -89,7 +86,7 @@ def help():
     Vypis navodu k pouziti skriptu
     """
     print("\nDescription:")
-    print("   Script is used to manage the database, which uses OpenBTS")
+    print("   Script is used to manage the database, which is used by OpenBTS and Asterisk")
     print("   to map VoIP extension to dial extension")
     print("   Database located in: /var/lib/asterisk/sqlite3dir/sqlite3.db")
     print("\nUsing the script:")
