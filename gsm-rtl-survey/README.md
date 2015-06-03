@@ -22,7 +22,7 @@ You will also have to clone a git repository of kalibrate-rtl. If you don't have
     make
     cd ..
 
-To initialize the database execute
+The script do not require you to "make install" kalibrate. To initialize the database execute
 
     sqlite3 -init btsdb_sqlite3.sql $SDB ".quit"
 
