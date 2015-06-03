@@ -9,6 +9,7 @@ An RTL2832U based USB DVB-T tuner is used to scan GSM900 frequency band and the 
 
 # Install
 
+You will need Wireshark, UHD, Gnuradio and gr-gsm (updated version of Airprobe. Check here: https://github.com/ptrkrysik/gr-gsm)
 Create a folder gsm-rtl-survey and copy all files to the folder.
 You will also have to clone a git repository of kalibrate-rtl. If you don't have a live internet connection you can unzip packed repository kalibrate-rtl.tar.gz that you will find among the files.
 
