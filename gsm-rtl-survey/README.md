@@ -55,7 +55,18 @@ You may want to update the script with a longer capture time. 10s seconds is usu
 
 "gsm-rtl-survey.sh" script will produce "kal-rtl-scan.txt" file containing the list of local ARFCNs in use and a number of *.xml files. Each *.xml file corresponds to ARFCN and contains a capture of the GSM signal at the particular ARFCN decoded by tshark (Wireshark). The script "pdml2sqlite.py" will then extract the data from all *.xml capture files and put it in an Sqlite3 database.
 
-## BTS parameters being captured:
+I use sqlitebrowser (sudo apt-get install sqlitebrowser) to browse the database:
+
+    sqlitebrowser btsdb.db
+
+If you want to see the transmission live in Wireshark you should run airprobe in one terminal window and Wireshark in another:
+
+    airprobe_rtlsdr.py
+    wireshark -k -Y '!icmp && gsmtap' -i lo
+
+Checkout this link for running airprobe with USRP: https://sourceforge.isae.fr/projects/ralf/wiki/GSM_receiver_with_gr-gsm_and_Wireshark
+
+## BTS parameters being captured in database:
 'timestamp', 'GSM.Identity.BSIC.BCC', 'GSM.Identity.BSIC.NCC', 'GSM.Identity.CI',
 'GSM.Identity.LAC', 'GSM.Identity.MCC', 'GSM.Identity.MNC', 'GSM.Identity.ShortName',
 'GSM.Radio.C0', 'GSM.Radio.Band', 'GSM.Radio.NeighbourARFCNs'
