@@ -1,0 +1,50 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>OpenBTS Configuration Database </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="./examples/tbs_us_examples_styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>OpenBTS Configuration Database </h1>
+<div id="main-body">
+	<p style="text-align:auto;">This page displays the actual configuration of your OpenBTS.
+If the key is "Static" you have to restart OpenBTS for the changes to take effect.
+It is recommended to use provided script to edit the database.
+You will not be able to start OpenBTS if your database is corrupted or configuration is invalid!
+This database is located in /etc/OpenBTS/OpenBTS.db </p>
+  <div id="example">
+    <p style="text-align:center; color:#F00">This example is not working because there is no SQLite3 connection available. See the corresponding PHP script in order to configure the connection.<br />
+    [onshow;block=p;when [var.sql_ok]=0]</p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+      <tr class="title-section2" style="background-color:#CACACA;">
+        <th align="left">KEYSTRING</th>
+        <th align="left">VALUESTRING</th>
+        <th align="center">STATIC</th>
+        <th align="center">OPTIONAL</th>
+        <th align="left">COMMENTS</th>
+      </tr>
+      <tr style="background-color:#F0F0F0;">
+        <td>[blk1.KEYSTRING;block=tr]</td>
+        <td>[blk1.VALUESTRING;block=tr]</td>
+        <td align="center">[blk1.STATIC;block=tr]</td>
+        <td align="center">[blk1.OPTIONAL;block=tr]</td>
+        <td align="left">[blk1.COMMENTS;block=tr]</td>
+      </tr>
+      <tr style="background-color:#E6E6E6;">
+        <td>[blk1.KEYSTRING;block=tr]</td>
+        <td>[blk1.VALUESTRING;block=tr]</td>
+        <td align="center">[blk1.STATIC;block=tr]</td>
+        <td align="center">[blk1.OPTIONAL;block=tr]</td>
+        <td align="left">[blk1.COMMENTS;block=tr]</td>
+      </tr>
+      <tr style="background-color:#FFCFB9;">
+        <td colspan="4">[blk1;block=tr;nodata]There is no data. </td>
+      </tr>
+    </table>
+    <p style="text-align:center;">There are [blk1.#] displayed lines.</p>
+    <div class="w3cinfo"> W3C compliant <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" style="border:none;" /></a> </div>
+  </div>
+</div>
+</body>
+</html>

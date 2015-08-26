@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 23
+/svn/!svn/ver/113/trunk
+END
+index.php
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/111/trunk/index.php
+END
+download.php
+K 25
+svn:wc:ra_dav:version-url
+V 35
+/svn/!svn/ver/93/trunk/download.php
+END
+callrates.csv
+K 25
+svn:wc:ra_dav:version-url
+V 37
+/svn/!svn/ver/112/trunk/callrates.csv
+END
+asterisk-cdr-viewer-latest.tgz
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/svn/!svn/ver/113/trunk/asterisk-cdr-viewer-latest.tgz
+END

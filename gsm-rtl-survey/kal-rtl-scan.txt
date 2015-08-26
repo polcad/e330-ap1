@@ -1,12 +1,10 @@
 GSM-900:
-	chan: 21 (939.2MHz - 1.288kHz)	power: 295903.22
-	chan: 25 (940.0MHz - 1.124kHz)	power: 365380.16
-	chan: 31 (941.2MHz - 1.790kHz)	power: 345730.72
-	chan: 34 (941.8MHz - 1.196kHz)	power: 367212.44
-	chan: 50 (945.0MHz - 1.470kHz)	power: 346651.51
-	chan: 58 (946.6MHz - 2.072kHz)	power: 355848.29
-	chan: 60 (947.0MHz - 1.110kHz)	power: 1379556.06
-	chan: 109 (956.8MHz - 1.581kHz)	power: 760365.85
-	chan: 113 (957.6MHz - 1.343kHz)	power: 279117.85
-	chan: 115 (958.0MHz - 2.164kHz)	power: 1132616.13
-	chan: 117 (958.4MHz - 1.219kHz)	power: 243505.26
+	chan: 24 (939.8MHz + 367Hz)	power: 718758.33
+	chan: 25 (940.0MHz +  13Hz)	power: 374429.65
+	chan: 54 (945.8MHz + 698Hz)	power: 1721290.01
+	chan: 69 (948.8MHz + 904Hz)	power: 2203099.59
+	chan: 75 (950.0MHz + 1.128kHz)	power: 3078746.40
+	chan: 82 (951.4MHz + 962Hz)	power: 4012613.48
+	chan: 95 (954.0MHz + 130Hz)	power: 885757.59
+	chan: 106 (956.2MHz - 31.997kHz)	power: 433873.03
+	chan: 124 (959.8MHz + 811Hz)	power: 1927550.75

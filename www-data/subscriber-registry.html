@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Subscriber Registry Configuration Database </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="./examples/tbs_us_examples_styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Subscriber Registry  Configuration Database </h1>
+<div id="main-body">
+	<p style="text-align:auto;">This page displays the actual configuration of your Subscriber Registry Database.
+	The Home Location Register (HLR) is a database that stores information about the user, including the user profile
+(preferences), account status, features and capabilities.
+<pre>The information stored includes:
+• Subscriber identity (i.e. IMSI, MSISDN, IMEI/Hardware serial number)
+• Subscriber supplementary services
+• Subscriber location information
+• Subscriber authentication information
+</pre>
+If you see an IMSI number but there is no callerid associated with that number then this handset can make phone calls, 
+but it will not be possible to receive any calls in most cases. The handset can however receive text messages send from CLI.
+It is recommended to use provided script to edit the database.
+For clarity only some columns of the database are displayed on this page.
+For a complete view of the database please use a database editor, i.e. sqlitebrowser.
+You will not be able to start OpenBTS or place a phone call if your database is corrupted or configuration is invalid!
+This database is located in /var/lib/asterisk/sqlite3dir/sqlite3.db </p>
+<p style="text-align:auto;color:blue">Currently your system has [onshow.rec_cnt] subscribers.</p></div>
+  <div id="example">
+    <p style="text-align:center; color:#F00">This example is not working because there is no SQLite3 connection available. See the corresponding PHP script in order to configure the connection.<br />
+    [onshow;block=p;when [var.sql_ok]=0]</p>
+    
+    <p style="text-align:center; color:#F00"></p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+      <tr class="title-section2" style="background-color:#CACACA;">
+        <th align="left">ID</th>
+        <th align="left">CALLERID</th>
+        <th align="left">NAME</th>
+        <th align="left">Username</th>
+        <th align="left">DefaultUser</th>
+        <th align="left">IMEI / HARDWARE</th>
+        <th align="left">SECRET</th>
+        <th align="left">allow</th>
+        <th align="left">context</th>
+        <th align="left">AccountBalance</th>
+        <th align="left">RRLPSupported</th>
+        <th align="left">regseconds</th>
+        <th align="left">regTime</th>
+        <th align="left">FULLCONTACT</th>
+      </tr>
+      <tr style="background-color:#F6F0F0;">
+        <td align="center">[blk1.id;block=tr]</td>
+        <td align="center">[blk1.callerid;block=tr]</td>
+        <td align="center">[blk1.name;block=tr]</td>
+        <td align="center">[blk1.username;block=tr]</td>
+        <td align="center">[blk1.defaultuser;block=tr]</td>
+        <td align="center">[blk1.hardware;block=tr]</td>
+        <td align="center">[blk1.secret;block=tr]</td>
+        <td align="center">[blk1.allow;block=tr]</td>
+        <td align="center">[blk1.context;block=tr]</td>
+        <td align="center">[blk1.account_balance;block=tr]</td>
+        <td align="center">[blk1.RRLPSupported;block=tr]</td>
+        <td align="center">[blk1.regseconds;block=tr]</td>
+        <td align="center">[blk1.regTime;block=tr]</td>
+        <td align="center">[blk1.fullcontact;block=tr]</td>
+      </tr>
+      <tr style="background-color:#E0E6E6;">
+        <td align="center">[blk1.id;block=tr]</td>
+        <td align="center">[blk1.callerid;block=tr]</td>
+        <td align="center">[blk1.name;block=tr]</td>
+        <td align="center">[blk1.username;block=tr]</td>
+        <td align="center">[blk1.defaultuser;block=tr]</td>
+        <td align="center">[blk1.hardware;block=tr]</td>
+        <td align="center">[blk1.secret;block=tr]</td>
+        <td align="center">[blk1.allow;block=tr]</td>
+        <td align="center">[blk1.context;block=tr]</td>
+        <td align="center">[blk1.account_balance;block=tr]</td>
+        <td align="center">[blk1.RRLPSupported;block=tr]</td>
+        <td align="center">[blk1.regseconds;block=tr]</td>
+        <td align="center">[blk1.regTime;block=tr]</td>
+        <td align="center">[blk1.fullcontact;block=tr]</td>
+      </tr>
+      <tr style="background-color:#FFCFB9;">
+        <td colspan="4">[blk1;block=tr;nodata]There is no data. </td>
+      </tr>
+    </table>
+    <p style="text-align:center;">There are [blk1.#] displayed lines.</p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+      <tr class="title-section2" style="background-color:#CACACA;">
+        <th align="left">ID</th>
+        <th align="left">exten</th>
+        <th align="left">dial</th>
+      </tr>
+      <tr style="background-color:#F6F0F0;">
+        <td align="center">[blk2.id;block=tr]</td>
+        <td align="center">[blk2.exten;block=tr]</td>
+        <td align="center">[blk2.dial;block=tr]</td>
+
+      </tr>
+      <tr style="background-color:#E0E6E6;">
+        <td align="center">[blk2.id;block=tr]</td>
+        <td align="center">[blk2.exten;block=tr]</td>
+        <td align="center">[blk2.dial;block=tr]</td>
+      </tr>
+      <tr style="background-color:#FFCFB9;">
+        <td colspan="3">[blk2;block=tr;nodata]There is no data. </td>
+      </tr>
+    </table>
+    <p style="text-align:center;">There are [blk2.#] displayed lines.</p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+      <tr class="title-section2" style="background-color:#CACACA;">
+        <th align="left">ID</th>
+        <th align="left">name</th>
+        <th align="left">latitude</th>
+        <th align="left">longitude</th>
+        <th align="left">error</th>
+        <th align="left">time</th>
+      </tr>
+      <tr style="background-color:#F6F0F0;">
+        <td align="center">[blk3.id;block=tr]</td>
+        <td align="center">[blk3.name;block=tr]</td>
+        <td align="center">[blk3.latitude;block=tr]</td>
+        <td align="center">[blk3.longitude;block=tr]</td>
+        <td align="center">[blk3.error;block=tr]</td>
+        <td align="center">[blk3.time;block=tr]</td>
+      </tr>
+      <tr style="background-color:#E0E6E6;">
+        <td align="center">[blk3.id;block=tr]</td>
+        <td align="center">[blk3.name;block=tr]</td>
+        <td align="center">[blk3.latitude;block=tr]</td>
+        <td align="center">[blk3.longitude;block=tr]</td>
+        <td align="center">[blk3.error;block=tr]</td>
+        <td align="center">[blk3.time;block=tr]</td>
+      </tr>
+      <tr style="background-color:#FFCFB9;">
+        <td colspan="6">[blk3;block=tr;nodata]There is no data. </td>
+      </tr>
+    </table>
+    <p style="text-align:center;">There are [blk3.#] displayed lines.</p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+      <tr class="title-section2" style="background-color:#CACACA;">
+        <th align="left">Service</th>
+        <th align="left">Rate</th>
+      </tr>
+      <tr style="background-color:#F6F0F0;">
+        <td align="center">[blk4.service;block=tr]</td>
+        <td align="center">[blk4.rate;block=tr]</td>
+      </tr>
+      <tr style="background-color:#E0E6E6;">
+        <td align="center">[blk4.service;block=tr]</td>
+        <td align="center">[blk4.rate;block=tr]</td>
+      </tr>
+      <tr style="background-color:#FFCFB9;">
+        <td colspan="2">[blk4;block=tr;nodata]There is no data. </td>
+      </tr>
+    </table>
+    <p style="text-align:center;">There are [blk4.#] displayed lines.</p>
+    <div class="w3cinfo"> W3C compliant <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" style="border:none;" /></a> </div>
+  </div>
+
+</body>
+</html>

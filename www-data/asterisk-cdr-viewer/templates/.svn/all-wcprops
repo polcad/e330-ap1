@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 33
+/svn/!svn/ver/112/trunk/templates
+END
+footer.tpl.php
+K 25
+svn:wc:ra_dav:version-url
+V 48
+/svn/!svn/ver/112/trunk/templates/footer.tpl.php
+END
+form.tpl.php
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/!svn/ver/103/trunk/templates/form.tpl.php
+END
+header.tpl.php
+K 25
+svn:wc:ra_dav:version-url
+V 47
+/svn/!svn/ver/94/trunk/templates/header.tpl.php
+END

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 39
+/svn/!svn/ver/110/trunk/include/plugins
+END
+au_callrates.csv
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/svn/!svn/ver/68/trunk/include/plugins/au_callrates.csv
+END
+au_callrates.inc.php
+K 25
+svn:wc:ra_dav:version-url
+V 60
+/svn/!svn/ver/110/trunk/include/plugins/au_callrates.inc.php
+END

@@ -1,0 +1,315 @@
+
+====================================================================================
+
+      Asterisk Event Monitor (C) 2006-2011  Earl C. Terwilliger  earl@micpc.com
+
+====================================================================================
+
+The Asterisk Event Monitor is a WEB/AJAX based 'Switch Board' of sorts with more
+functionality. Asterisk Events are captured as the occur via a python script called
+ProxyMan.py and logged to a MySQl database table. Since Asterisk is sending these events
+as they occur (and not being polled for these events), this leads to a more efficient
+Asterisk interface.
+
+ProxyMan.py is a Python script which connects to the Asterisk Manager
+Interface via a TCP/IP connection, listens for any events or messages coming from
+the Manager Interface, time stamps each event and logs them to a MySQL database table.
+
+ProxyMan can be run on any machine with a TCP/IP connection to the Asterisk server,
+i.e. it does not have to run on the same machine as Asterisk.
+More information on the function of ProxyMan can be found in its source comments.
+
+WEB PHP scripts display the events and color coded 'buttons' show the current state
+of SIP devices, ZAP channels and/or Agents. 
+
+One nice feature of the Event Monitor is that little or no customization is needed, all
+of the information display (agents, sips devices, zap channels) is gathered directly
+from the event log and or the existing Asterisk configuration files.
+
+The Event Monitor scripts require a running WEB and MySQL server. All of these
+processes can run on the same server, however, multiple servers enhance performance.
+
+The Event Monitor has two main (index) WEB pages. Index.php is the main monitor
+WEB page and agents_index.php is the agents WEB page. The AGENTS button displays the
+agents_index.php page and the MONITOR button displays the index.php page.
+
+When either of these (AJAX enabled) PHP scripts are invoked they check for updates
+every several seconds. The page is only updated if there are any changes (i.e., 
+new events).
+
+The index.php script has three HTML DIV sections, each updated separately,
+as follows:
+
+ 1) SIP devices  (from /etc/asterisk/sip.conf) updated via sip.php
+ 2) ZAP channels (from /etc/asterisk/zapata.conf) updated via channels.php
+ 3) events list  (from the MySQL asterisk.events table) updated via events.php
+
+The agents_index.php script WEB page has two HTML DIV sections, each updated 
+separately, as follows:
+
+ 1) agents list (from /etc/asterisk/agents.conf) updated via agents.php
+ 2) events list (from the MySQL asterisk.events table) updated via agents_events.php
+
+Both of these index pages try to open /etc/asterisk configuration files, however,
+if these files are not available, the device buttons are created solely from 
+information obtained via event records. If the files are available the initial 
+buttons are created from information in these files and then updated (and new ones
+created) from event record information.
+
+On any of these index pages, any of the buttons can be clicked to create (via the
+eventlist.php script) a detailed list of all events associated with that button
+(i.e. sip device, zap channel, agent, etc.)
+
+From any of the WEB pages, any specific event can be listed (again via the
+eventlist.php script invoked with a specific record id). Also when appropriate,
+the CDR log can be searched via the CDR SEARCH or CDR RECORD buttons
+(invoking the cdr_list.php script).
+
+When a specific event is listed, an additional set of clickable buttons is
+displayed which can invoke specific Asterisk Manager commands. Available manager
+commands include call monitor, call transfer, call hangup, etc. and are invoked
+via cmdprompt.php which prompts via a WEB form the needed Manager information
+to complete the command. Cmdprompt.php then invokes cmdexec.php. 
+
+For the Asterisk Manager commands to work, the cmdexec.php script needs to login
+to the Asterisk Manager Interface (AMI). If the web server is not the same server 
+running Asterisk, the script will need to be changed to login correctly. (See
+the install section below for details)
+
+Event Monitor Installation: (assuming your WEB root is /var/www/html)
+
+1) Download and untar the source
+
+     cd /var/www/html
+     wget http://www.micpc.com/eventmonitor/events.tar.gz
+     tar -xzvf events.tar.gz
+
+     Note: this creates the /var/www/html/events directory which contains the
+     PHP scripts and several sub-directories. 
+
+        /var/www/html/events			main directory and PHP scripts  
+	/var/www/html/events/proxyman 		proxyman related files
+	/var/www/html/events/includes 		files needed via the PHP scripts
+	/var/www/html/events/images		image files used via the PHP scripts
+
+     It is highly advised that the whole proxyman directory be moved to a more secure
+     location like /opt and out of the WEB root directory (see step 4)
+
+2) From a shell prompt, create the MySQL database and table
+
+      mysql </var/www/html/events/proxyman/events.sql
+
+   Note: The events.sql file creates the database called asterisk and has the
+         the GRANT commands to update MySQL with the desired authority.
+         The settings here must match the userid/password specified in the
+         ProxyMan.py script and the includes/db_connect.php script.
+
+   Update the /var/www/html/events/includes/db_connect.php script for the
+   correct MySQL login userid/password. Make sure it matches what was specified
+   in the events.sql file.
+
+   Update the /var/www/html/events/proxyman/ProxyMan.py script for the correct MySQL
+   login userid/password. Make sure it matches what was specified in the
+   events.sql file. ProxMan.py also needs updated with the Asterisk Manager
+   password and secret (password), documented in the next step.
+   The proxyman.py script has comments in the source noting the variable names
+   and their functions.
+
+3) Update /etc/asterisk/manager.conf to enable Manager connections
+ 
+       Add something like this to the manager.conf file:
+
+	[general]
+	enabled = yes
+	port = 5038
+	bindaddr = 0.0.0.0
+	;displayconnects = yes
+
+	[eventmanager]
+	secret = asterisksecret
+	read = system,call,log,verbose,command,agent,user
+	write = system,call,log,verbose,command,agent,user
+
+   Note: the manager.conf settings for user ([eventmanager] in this example)
+	 and secret need to match the /var/www/html/ProxyMan.py variable settings.
+	 The ProxyMan.py script has comments in the source noting the variable
+	 names and their functions.
+
+
+ ******** Some versions of Asterisk require other config files to be edited to allow AMI events
+          For example: Asterisk 1.8 needs cel.conf changes to enable certain events
+         
+4) Create the directories and move the scripts:
+
+        mkdir /opt/asterisk
+        mkdir /opt/asterisk/scripts
+        mkdir /opt/asterisk/scripts/events
+	mv /var/www/html/events/proxyman/* /opt/asterisk/scripts/events
+
+5) Remove the optional debug directory
+        rm -rf /var/www/html/events/debug
+
+        Note: there is a script there for debugging purposes
+
+6) Start Asterisk and  ProxyMan.py
+
+   Start ProxyMan (default settings):
+
+	/opt/asterisk/scripts/events/ProxyMan.py 
+
+   OR Start ProxyMan (change settings):
+
+        /opt/asterisk/scripts/events/ProxyMan.py debug 
+
+   Note: when ProxyMan.py starts it will automatically become a daemon
+         (so no need for for the & at the end of the command)
+         
+   Another python script is provided (asterstart.py) which can also be used to start
+   Asterisk and ProxyMan.py and keep them running. See the README in the proxyman 
+   directory.
+ 
+   At some point it may be desirable to delete unwanted events from the database
+   table. The Python script delete_events.py is designed for this.
+   If run from a CRON task:
+
+      1   0   * * * /opt/asterisk/scripts/events/delete_events.py >/dev/null 2>&1
+
+   It will delete all events older than the current date (as of midnight
+   the previous day).
+
+7) This step is only needed to allow Manager Functions.
+
+   If the web server is not the same server that Asterisk is running on, for
+   the manager commands to work, the file
+
+       /var/www/html/events/includes/manager_login.php
+
+   needs customized. It will by default, try to open the
+
+       /etc/asterisk/manager.conf
+
+   file and get the user and secret from there to  use for Manager Login. 
+   Update it with the correct IP address, manager id and password to make the TCP/IP
+   connection to a different server and delete the code that tries to open the
+   /etc/asterisk/manager.conf file. Edit the file and look at the comments for
+   more information on this.
+
+   This customization is also necessary for the "Queues" option to work.
+   The queues.php code invokes Manager commands to display the Agent and Queue
+   Information. It does not obtain it from the event records.
+   
+8) Testing: browse to http://localhost/events
+
+	        or http://YOUR-WEB-SERVER-ADDRESS/events
+
+Default login is Userid: admin Password: admin
+this can be changed, look at the comments in the getpass.php script.
+
+9) Things to check if you are experiencing problems:
+
+   make sure your browser has Javascript enabled for accessing this
+   make sure your web server (Apache) has access to read/execute these scripts
+        in the directory you are using
+   make sure that all the right passwords are in place for Asterisk and MySQL
+   make sure that MySQL starts 1st, Asterisk 2nd and then Proxyman.py last
+
+====================================================================================
+
+2006-05-31	Version 1.0 Released (GPL)
+
+2006-06-05	Version 1.1 Released         
+			Login/Logoff Required
+			Agents CRM menu - activated when Linked to Queue Caller
+
+2006-06-19      Version 1.2 Released
+			Added asterstart.py, see the README in the proxyman directory	
+2006-06-20      Version 1.2.1 Released
+			Updated asterstart.py, see the README in the proxyman
+                        directory	
+
+2006-09-21	Version 1.2.2 Released
+			Updated sip.php
+
+2006-10-25	Version 1.2.3 Released
+			Updated sip.php
+
+2006-12-13	Version 1.2.4 Released
+			Updated asterstart.py see the README in the proxyman directory
+			Updated eventlist.php to search(list) records by date if no
+                        	specific search pattern is given
+
+2007-04-15	Version 1.2.5 Released
+			Updated README documentation 
+			Updated functions to include channelspy()
+                        Updated getpass.php for more documentation on how to
+                        implement login userid and passwords
+
+2007-04-27	Version 1.2.6 Released
+			Updated HTML div tags to fix a browser problem
+
+2007-05-14	Version 1.3   Released
+			Added queues.php to show agents/queues
+                           (uses Manager interface)
+                        Changed header buttons (added queues)
+
+2007-10-30	Version 1.3.1 Released
+                        Changed index.php to fix parsing sip.conf
+
+2007-12-07	Version 1.4.2 Released
+			Changes to fix problems with empty events database
+                        caused  when delete_events.py runs to clean database
+
+2008-3-10	Version 1.4.3 Released
+			Changes to agents.php for agent login/logoff
+
+2008-4-4 	Version 1.5 Released
+			New versions of Proxyman.py and asterstart.py    
+
+2008-7-22 	Version 1.6 Released
+			New version of Proxyman.py
+			  Fixed MySql connection problems if MySql restarts
+                          Added optional event filter code (in comments)
+
+2008-7-29	Version 1.6.1 Released
+			Updated color in style.css
+
+2008-9-30 	Version 1.6.2 Released
+			New version of Proxyman.py
+			  Fixed MySql insert problem on MySQL database table
+			  if a transaction based engine is used (instead of MyISAM)
+                        Changes to login.php for no javascript message
+
+2009-3-3        Version 1.6.3 Released
+                        New version of Proxyman.py (added SQLport parameter)
+
+2009-3-25       Version 1.6.4 Released
+                        Fixed queues.php (socket closed one too many times)
+
+2009-7-8        Version 1.6.7 (not released)
+                        Update README with corrections to some directory names
+
+2009-9-25       Version 1.6.8 (not released)
+                        Added agentlogin.php and agentlogoff.php
+			(agent login/logoff from queues.php, this needs customized
+                        per installation due to agent ids)
+
+2010-1-4	Version 1.6.9 Released
+			Updated documentation
+
+2010-6-14	Version 1.7
+			Updated index.php to support DAHDI (or Zaptel)
+
+2011-1-12       Version 1.8
+                        Updated documentation
+                        Updated events.php,eventlist.php to correctly display events
+                        (when xml or html characters are in the data fields)
+
+2011-2-4	Version 1.8.1
+			Updated index.php to fix problems parsing sip.conf and DAHDI (or Zaptel) channels
+			New version of asterstart.py    
+
+====================================================================================
+
+       The author can be reached at earl@micpc.com for comments and suggestions.
+
+====================================================================================

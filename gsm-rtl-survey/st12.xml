@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="pdml2html.xsl"?>
+<pdml version="0" creator="wireshark/1.12.4" time="Sat Aug 15 14:18:38 2015" capture_file=""> 
+   <field name="gsm_a.dtap.msg_rr_type" showname="Message Type: System Information Type 1" size="1" pos="60" show="25" value="19"/>
+    <field name="" show="Cell Channel Description" size="16" pos="61" value="00000000480000000000000100000000">
+      <field name="gsm_a.rr.format_id" showname="00.. 000. = Format Identifier: bit map 0 (0x00)" size="1" pos="61" show="0" value="0" unmaskedvalue="00"/>
+      <field name="" show="List of ARFCNs = 95 92 33" size="16" pos="61" value="00000000480000000000000100000000"/>
+    </field>
+    <field name="gsm_a.dtap.msg_rr_type" showname="Message Type: System Information Type 2" size="1" pos="60" show="26" value="1a"/>
+    <field name="" show="Neighbour Cell Description - BCCH Frequency List" size="16" pos="61" value="18000002400200000001002061900000">
+      <field name="gsm_a.rr.ext_ind" showname="..0. .... = EXT-IND: The information element carries the complete BA (0)" size="1" pos="61" show="0" value="0" unmaskedvalue="18"/>
+      <field name="gsm_a.rr.ba_ind" showname="...1 .... = BA-IND: 1" size="1" pos="61" show="1" value="18"/>
+      <field name="gsm_a.rr.format_id" showname="00.. 100. = Format Identifier: bit map 0 (0x04)" size="1" pos="61" show="4" value="4" unmaskedvalue="18"/>
+      <field name="" show="List of ARFCNs = 124 98 95 82 49 38 31 30 25 24 21" size="16" pos="61" value="18000002400200000001002061900000"/>
+    </field>
+    <field name="" show="NCC Permitted" size="1" pos="77" value="8d">
+      <field name="gsm_a.rr.ncc_permitted" showname="1000 1101 = NCC Permitted: 0x8d" size="1" pos="77" show="141" value="8D" unmaskedvalue="8d"/>
+    </field>
+</pdml>

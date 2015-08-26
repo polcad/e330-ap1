@@ -1,0 +1,152 @@
+body
+{font-family: Helvetica, Arial, sans-serif;
+  background: #fff url(../images/white_bg.gif) repeat-x;
+  font-size: 12px}
+
+th
+{
+font-family: Helvetica, Arial, sans-serif;
+font-size: 12px;
+font-weight: bold;
+white-space: nowrap;
+background-color: #C6D3EF;
+}
+
+table { border: thin; }
+
+span.leftmenuitem
+{
+font-family: Helvetica, Arial, sans-serif;
+font-size: 12px;
+font-weight: bold;
+}
+
+td
+{font-family: Helvetica, Arial, sans-serif;
+font-size: 12px;
+white-space: nowrap;
+}
+
+address
+{font-family: Helvetica, Arial, sans-serif;
+font-size: 8pt}
+
+h5
+{font-family: Helvetica, Arial, sans-serif;
+font-size: 8pt}
+
+form
+{font-family: Helvetica, Arial, sans-serif;
+font-size: 12px}
+
+h1
+{font-family: Helvetica, Verdana, Arial, sans-serif;
+text-align: center;
+font-size: 16pt;
+font-weight: bold}
+
+h2
+{font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 14pt;
+font-weight: bold}
+
+A:link
+{color: blue;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 12px;
+text-decoration: none}
+
+A:visited
+{color: blue;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 12px;
+text-decoration: none}
+
+A:hover
+{color: red;
+font-family: Helvetica, Arial, sans-serif;
+font-size: 12px;
+text-decoration: underline}
+
+A:link.nav
+{color: #000000;
+font-family: Helvetica, Verdana, Arial, sans-serif}
+
+A:visited.nav
+{color: #000000;
+font-family: Helvetica, Verdana, Arial, sans-serif}
+
+A:hover.nav
+{color: red;
+font-family: Helvetica, Verdana, Arial, sans-serif}
+
+.nav
+{color: #000000;
+font-family: Helvetica, Verdana, Arial, sans-serif}
+
+A.age0min { color:#FF0000 }
+A.age5min { color:#FF00FF }
+A.age15min { color:#FF7F00 }
+A.age30min { color:#007FFF }
+A.age60min { color:#0000FF }
+
+A:visited.age0min { color:#FF0000 }
+A:visited.age5min { color:#FF00FF }
+A:visited.age15min { color:#FF7F00 }
+A:visited.age30min { color:#007FFF }
+A:visited.age60min { color:#0000FF }
+
+#ButtonB  { width: 120px; height: 25px; 
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 16px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#000099;    color:white;   }
+#ButtonF  { width: 120px; height: 25px; 
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#993300;    color:white;   }
+#ButtonR  { width: 120px; height: 25px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 16px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#CC0033;    color:white;   }
+#ButtonY  { width: 120px; height: 25px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#FFFF00;    color:black;   }
+#ButtonG  { width: 120px; height: 25px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 16px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#006600;    color:white;   }
+#ButtonU  { width: 120px; height: 25px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 16px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#CC3399;    color:white;   }
+#Sel      { width: 120px; height: 25px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 12px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#0033CC;    color:white;   }
+#ButtonA  { width: 85px; height: 20px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 10px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#993300;    color:white;   }
+#ButtonYA { width: 85px; height: 20px;
+            white-space: nowrap;
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 10px; font-weight: bold;
+            text-align: center; border: none;
+            background-color:#FFFF00;    color:black;   }

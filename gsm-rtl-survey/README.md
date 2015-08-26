@@ -30,15 +30,16 @@ The script do not require you to "make install" kalibrate. To initialize the dat
 
 First you need to make sure you calibrated your RTL dongle. They have a large frequency error and can give false ARFCN readings. In order to calibrate your dongle run:
 
-    kal -s GSM900 -g 50
+    cd kalibrate-rt/src
+    ./kal -s GSM900 -g 50
 
 It should return a list of ARFCN channels that it finds in your area. Pick one of the channels and run:
 
-    kal -s GSM900 -a 25 -g 50
+    ./kal -s GSM900 -a 25 -g 50
 
 This will use ARFCN=25 to kalibrate the dongle. It will also print average ppm error in the results . Run kalibrate again specifying this ppm in the options, ie. if the ppm was 55:
 
-    kal -s GSM900 -g 50 -e 55
+    ./kal -s GSM900 -g 50 -e 55
 
 kalibrate will print a list of ARFCN it found and frequency error.
 You can run kalibrate several times changing the value in "-e" option untill you get 0Hz error. This will probably not be possible, as RTL dongles are poor quality and this frequency error is usually large and varying with time and frequency.
@@ -46,7 +47,7 @@ Next, update the script "gsm-rtl-survey.sh" with your PPM value.
 
 Now the system is calibrated and ready to run. You run the survey with command:
 
-    gsm-rtl-survey.sh
+    ./gsm-rtl-survey.sh
 
 You may want to update the script with a longer capture time. 10s seconds is usually enough.
 
@@ -57,7 +58,7 @@ You may want to update the script with a longer capture time. 10s seconds is usu
 
 I use sqlitebrowser (sudo apt-get install sqlitebrowser) to browse the database:
 
-    sqlitebrowser btsdb.db
+    sqlitebrowser btsdb.db &
 
 If you want to see the transmission live in Wireshark you should run airprobe in one terminal window and Wireshark in another:
 
