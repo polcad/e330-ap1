@@ -22,7 +22,7 @@ function tbsdb_csv_open(&$Source, &$Query)
     if (!defined('TBS_CSV_DELIMITER'))
       define('TBS_CSV_DELIMITER', ',');
     if (!defined('TBS_CSV_LENGTH'))
-      define('TBS_CSV_LENGTH', 1024);
+      define('TBS_CSV_LENGTH', 2048);
     $field = @fgetcsv($handle, TBS_CSV_LENGTH, TBS_CSV_DELIMITER);
     return array
     (

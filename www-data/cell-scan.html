@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>SMQUEUE Configuration Database </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="./examples/tbs_us_examples_styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Cell scan results </h1>
+<div id="main-body">
+	<p style="text-align:auto;">This page displays cell scan results. </p>
+  <div id="example">
+    <p style="text-align:center; color:#F00">This example is not working because there is no SQLite3 connection available. See the corresponding PHP script in order to configure the connection.<br />
+    [onshow;block=p;when [var.sql_ok]=0]</p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+    <tr bgcolor="#CACACA">
+      <td width="50"><strong>Nr</strong></td>
+      <td width="50"><strong>Date_Time</strong></td>
+      <td width="50"><strong>lac-cellid</strong></td>
+      <td width="50"><strong>ARFCN</strong></td>
+      <td width="50"><strong>MCC</strong></td>
+      <td width="50"><strong>MNC</strong></td>
+      <td width="50"><strong>Operator</strong></td>
+      <td width="50"><strong>nr of IMSIs</strong></td>
+      <td width="50"><strong>nr of TMSIs</strong></td>
+      <td width="50"><strong>nr of subscribers</strong></td>
+      <td width="50"><strong>nr of channels</strong></td>
+      <td width="50"><strong>channels list</strong></td>
+      <td width="50"><strong>nr of neighbours</strong></td>
+      <td width="50"><strong>neighbours list</strong></td>
+    </tr>
+    
+    <tr bgcolor="#F0F0F0">
+      <td>[blk1.#;block=tr]</td>
+      <td>[blk1.time]</td>
+      <td>[blk1.lac-cellid]</td>
+      <td>[blk1.arfcn]</td>
+      <td>[blk1.mcc]</td>
+      <td>[blk1.mnc]</td>
+      <td>[blk1.operator]</td>
+      <td>[blk1.num_imsis]</td>
+      <td>[blk1.num_tmsis]</td>
+      <td>[blk1.num_subs]</td>
+      <td>[blk1.num_chan]</td>
+      <td>[blk1.chan_list]</td>
+      <td>[blk1.num_neighbours]</td>
+      <td>[blk1.neighbours_list]</td>
+    </tr>
+    <tr bgcolor="#E6E6E6">
+      <td>[blk1.#;block=tr]</td>
+      <td>[blk1.time]</td>
+      <td>[blk1.lac-cellid]</td>
+      <td>[blk1.arfcn]</td>
+      <td>[blk1.mcc]</td>
+      <td>[blk1.mnc]</td>
+      <td>[blk1.operator]</td>
+      <td>[blk1.num_imsis]</td>
+      <td>[blk1.num_tmsis]</td>
+      <td>[blk1.num_subs]</td>
+      <td>[blk1.num_chan]</td>
+      <td>[blk1.chan_list]</td>
+      <td>[blk1.num_neighbours]</td>
+      <td>[blk1.neighbours_list]</td>
+    </tr>
+    
+    <tr style="background-color:#FFCFB9;">
+        <td colspan="3">[blk1;block=tr;nodata]There is no data. </td>
+    </tr>
+    
+    </table>
+    <p style="text-align:center;">There are [blk1.#] displayed lines.</p>
+    <div class="w3cinfo"> W3C compliant <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" style="border:none;" /></a> </div>
+  </div>
+</div>
+</body>
+</html>
