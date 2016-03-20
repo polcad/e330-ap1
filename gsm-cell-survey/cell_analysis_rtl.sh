@@ -1,13 +1,10 @@
 #!/bin/bash
 
 ######################################################################
-#       FakeBTS.com
 #       2014
-#       v 0.1.6
-#		updated by Dictador, June 2015
+#       v 0.1.7
+#		updated by Dictador, October 2015
 #######################################################################
-#
-#   Copyright (C) 2014 Pedro Cabrera
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,10 +18,6 @@
 #
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#
-#    Contact Info:
-#    @PCabreraCamara
-#    pedrocab@gmail.com
 #
 #######################################################################
 
@@ -53,7 +46,6 @@ export DISPLAY
 
 # Licencia
 function disclaimer {
-        echo "CellAnalysis  Copyright (C) 2014 Pedro Cabrera"
         echo "This program comes with ABSOLUTELY NO WARRANTY; for details visit http://www.gnu.org/licenses/gpl.txt"
         echo "This is free software, and you are welcome to redistribute it"
         echo "under certain conditions; for details visit http://www.gnu.org/licenses/gpl.txt."
@@ -123,12 +115,17 @@ then
 		grep "MSI" /tmp/tshark_subs_${arfcn}.txt > /dev/null 2>&1
 		if [ $? -eq 0 ]
 		then
-			num_imsis=`grep "gsm_a.imsi" /tmp/tshark_subs_${arfcn}.txt| sort -u | wc -l`
-			num_tmsis=`grep "gsm_a.tmsi" /tmp/tshark_subs_${arfcn}.txt| sort -u | wc -l`
-			num_subs=num_imsis+num_tmsis
+			imsi_list=$(grep ".imsi" /tmp/tshark_subs_${arfcn}.txt| sort -u|awk -F"show=\"" '{print $2}'|awk -F"\"" '{print $1}')
+			tmsi_list=$(grep ".tmsi" /tmp/tshark_subs_${arfcn}.txt| sort -u|awk -F"show=\"" '{print $2}'|awk -F"\"" '{print $1}')
+			num_imsis=`grep ".imsi" /tmp/tshark_subs_${arfcn}.txt| sort -u | wc -l`
+			num_tmsis=`grep ".tmsi" /tmp/tshark_subs_${arfcn}.txt| sort -u | wc -l`
 			num_subs=`echo $[${num_imsis} + ${num_tmsis}]`
 		else
 			num_subs=0
+			imsi_list=""
+			tmsi_list=""
+			num_imsis=0
+			num_tmsis=0
 		fi
 
 		# Number of CCCH frames captured
@@ -146,12 +143,16 @@ then
                 umbral_subs=`echo $[$num_lin * 0,2]`
 
 		# Number of ARFCN channels and their numbers in the cell
+		channel=""
+		num_chan=0
+		chan_list=""
                 "${TSHARKBIN}" -r /tmp/tshark_${arfcn}.pcap -c 1 -T pdml -2 -R "gsm_a.dtap.msg_rr_type == 0x19" > /tmp/tshark_canales_${arfcn}.txt 2>&1
 		grep "List" /tmp/tshark_canales_${arfcn}.txt > /dev/null 2>&1
 		if [ $? -eq 0 ]
 		then
-	                num_chan=`cat /tmp/tshark_canales_${arfcn}.txt |grep "List"| awk -F"\"" '{print $4}'| cut -d= -f2| awk '{print NF}'`
-			chan_list=`cat /tmp/tshark_canales_${arfcn}.txt |grep "List"| awk -F"\"" '{print $4}'| cut -d= -f2`
+			chan_list=`cat /tmp/tshark_canales_${arfcn}.txt |grep "List of ARFCNs"| awk -F"\"" '{print $4}'| cut -d= -f2`
+			#chan_list=$(($(xmllint --xpath '//field/field[./@name="gsm_a.rr.arfcn_list"]/@showname' /tmp/tshark_canales_${arfcn}.txt| grep -Po '".*"?' | tr -d \"| cut -d"=" -f2)))
+			num_chan=$(($(echo $chan_list |wc -w)))
        		        if [ ${num_chan} -eq 1 ]
 			then
                        		channel=`cat /tmp/tshark_canales_${arfcn}.txt | grep "List"| awk -F"\"" '{print $4}'| cut -d= -f2`
@@ -162,19 +163,21 @@ then
 		fi
 
 		# Neighbour ARFCN channels
+		num_neighbours=0
+		neighbours_list=""
                 "${TSHARKBIN}" -r /tmp/tshark_${arfcn}.pcap -c 1 -T pdml -2 -R "gsm_a.dtap.msg_rr_type == 0x1a" > /tmp/tshark_neighbours_${arfcn}.txt 2>&1
 		grep "List" /tmp/tshark_neighbours_${arfcn}.txt > /dev/null 2>&1
 		if [ $? -eq 0 ]
 		then
-	                num_neighbours=`cat /tmp/tshark_neighbours_${arfcn}.txt |grep "List of ARFCNs"| awk -F"\"" '{print $4}'| cut -d= -f2| awk '{print NF}'`
 			neighbours_list=`cat /tmp/tshark_neighbours_${arfcn}.txt |grep "List of ARFCNs"| awk -F"\"" '{print $4}'| cut -d= -f2`
+			num_neighbours=$(($(echo $neighbours_list |wc -w)))
        		        if [ ${num_neighbours} -eq 1 ]
 			then
                        		channel=`cat /tmp/tshark_neighbours_${arfcn}.txt | grep "List of ARFCNs"| awk -F"\"" '{print $4}'| cut -d= -f2`
                 	fi
 		else
 			num_neighbours=0
-			nchannel=666
+			#nchannel=666
 		fi
 
                	# Looking for CellID and LAC
@@ -182,11 +185,23 @@ then
 		grep "Cell CI" /tmp/tshark_cellid_${arfcn}.txt > /dev/null 2>&1
 		if [ $? -eq 0 ]
 		then
-                	#cellid=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "Cell CI" | awk -F"show=" '{print $2}'| cut -d"\"" -f2|awk '{print $3}'| sed 's/0x//'`
-			cellid=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "Cell CI"| awk -F"show=" '{print $2}'| cut -d"\"" -f2|cut -d"(" -f3| sed 's/)//g'`
+			cellid=0
+			lac=0
+			mcc=0
+			mnc=0
+                	##cellid=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "Cell CI" | awk -F"show=" '{print $2}'| cut -d"\"" -f2|awk '{print $3}'| sed 's/0x//'`
+			cellid=$(($(cat /tmp/tshark_cellid_${arfcn}.txt |grep "Cell CI"| awk -F"show=" '{print $2}'| cut -d"\"" -f2|cut -d"(" -f3| sed 's/)//g')))
                 	lac=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "LAC"| awk -F"show=" '{print $2}'| cut -d"\"" -f2|cut -d"(" -f3| sed 's/)//g'`
 			mcc=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "MCC"| awk -F"show=" '{print $2}'| cut -d"\"" -f2|cut -d"(" -f3| sed 's/)//g'`
 			mnc=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "MNC"| awk -F"show=" '{print $2}'| cut -d"\"" -f2|cut -d"(" -f3| sed 's/)//g'`
+			#cellid=$(($(xmllint --xpath '//field/field[./@name="gsm_a.bssmap.cell_ci"]/@show' /tmp/tshark_cellid_${arfcn}.txt| grep -Po '".*"?' | tr -d \")))
+			#lac=$(($(xmllint --xpath '//field/field[./@name="gsm_a.lac"]/@show' /tmp/tshark_cellid_${arfcn}.txt| grep -Po '".*"?' | tr -d \")))
+			#mcc=$(($(xmllint --xpath '//field/field[./@name="e212.mcc"]/@show' /tmp/tshark_cellid_${arfcn}.txt| grep -Po '".*"?' | tr -d \")))
+			#mnc=$(($(xmllint --xpath '//field/field[./@name="e212.mnc"]/@show' /tmp/tshark_cellid_${arfcn}.txt| grep -Po '".*"?' | tr -d \")))
+            if [ ${#mnc} -ne 2 ]
+                then
+                    mnc=0`echo "$mnc"`
+            fi
 			operador=`cat /tmp/tshark_cellid_${arfcn}.txt |grep "MNC"| awk -F"showname=" '{print $2}'| cut -d"\"" -f2|cut -d":" -f2 | cut -d"(" -f1`
 		else
 			cellid=0
@@ -197,7 +212,7 @@ then
 		fi
 	
 		#rm /tmp/tshark_subs_${arfcn}.txt	
-                #rm /tmp/tshark_canales_${arfcn}.txt
+        #rm /tmp/tshark_canales_${arfcn}.txt
 		#rm /tmp/tshark_cellid_${arfcn}.txt
 
 		if [ ${num_lin} -ne 0 ]

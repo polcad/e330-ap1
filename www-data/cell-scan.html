@@ -9,14 +9,17 @@
 <h1>Cell scan results </h1>
 <div id="main-body">
 	<p style="text-align:auto;">This page displays cell scan results. </p>
+    <p style="text-align:auto;">The results presented on this page come from a csv file. It may take a long time to load the results. </p>
+    <p style="text-align:auto;">Delete or move the csv file to improve the process. If you delete the csv file it will be created automatically the next time you start the cell scan script.</p>
+    <p style="text-align:auto;">The csv file is located in: /home/lenovo/bin/e330-ap1/gsm-cell-survey/cellscan.csv</p>
   <div id="example">
-    <p style="text-align:center; color:#F00">This example is not working because there is no SQLite3 connection available. See the corresponding PHP script in order to configure the connection.<br />
+    <p style="text-align:center; color:#F00">This example is not working because there is no csv file found. See the corresponding PHP script in order to configure the connection.<br />
     [onshow;block=p;when [var.sql_ok]=0]</p>
     <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
     <tr bgcolor="#CACACA">
       <td width="50"><strong>Nr</strong></td>
       <td width="50"><strong>Date_Time</strong></td>
-      <td width="50"><strong>lac-cellid</strong></td>
+      <td width="50"><strong>LAC-CELLID</strong></td>
       <td width="50"><strong>ARFCN</strong></td>
       <td width="50"><strong>MCC</strong></td>
       <td width="50"><strong>MNC</strong></td>
