@@ -1,0 +1,64 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>MCC MNC number list </title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link href="./examples/tbs_us_examples_styles.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h1>Cell scan results </h1>
+<div id="main-body">
+	<p style="text-align:auto;">This page displays MCC MNC number list. </p>
+    <p style="text-align:auto;">Mobile Country Codes (MCC) and Mobile Network Codes (MNC) table. </p>
+    <p style="text-align:auto;">This table is cloned from Github (https://github.com/musalbas/mcc-mnc-table.git). Remote table is updated daily. Clone the repository to update the table.</p>
+    <p style="text-align:auto;">The csv file is located in: /home/lenovo/bin/mcc-mnc-table/mcc-mnc-table.csv</p>
+  <div id="example">
+    <p style="text-align:center; color:#F00">This example is not working because there is no csv file found. See the corresponding PHP script in order to configure the connection.<br />
+    [onshow;block=p;when [var.sql_ok]=0]</p>
+    <table border="1" cellpadding="2" cellspacing="0" style="margin-left:auto; margin-right:auto;">
+    <tr bgcolor="#CACACA">
+      <td width="50"><strong>Nr</strong></td>
+      <td width="50"><strong>MCC</strong></td>
+      <td width="100"><strong>MCC (int)</strong></td>
+      <td width="50"><strong>MNC</strong></td>
+      <td width="100"><strong>MNC (int)</strong></td>
+      <td width="50"><strong>ISO</strong></td>
+      <td width="200"><strong>Country</strong></td>
+      <td width="50"><strong>Country Code</strong></td>
+      <td width="300"><strong>Network</strong></td>
+    </tr>
+
+    <tr bgcolor="#F0F0F0">
+      <td>[blk1.#;block=tr]</td>
+      <td>[blk1.MCC]</td>
+      <td>[blk1.MCC (int)]</td>
+      <td>[blk1.MNC]</td>
+      <td>[blk1.MNC (int)]</td>
+      <td>[blk1.ISO]</td>
+      <td>[blk1.Country]</td>
+      <td>[blk1.Country Code]</td>
+      <td>[blk1.Network]</td>
+    </tr>
+    <tr bgcolor="#E6E6E6">
+      <td>[blk1.#;block=tr]</td>
+      <td>[blk1.MCC]</td>
+      <td>[blk1.MCC (int)]</td>
+      <td>[blk1.MNC]</td>
+      <td>[blk1.MNC (int)]</td>
+      <td>[blk1.ISO]</td>
+      <td>[blk1.Country]</td>
+      <td>[blk1.Country Code]</td>
+      <td>[blk1.Network]</td>
+    </tr>
+    
+    <tr style="background-color:#FFCFB9;">
+        <td colspan="3">[blk1;block=tr;nodata]There is no data. </td>
+    </tr>
+    
+    </table>
+    <p style="text-align:center;">There are [blk1.#] displayed lines.</p>
+    <div class="w3cinfo"> W3C compliant <a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml11" alt="Valid XHTML 1.1" height="31" width="88" style="border:none;" /></a> </div>
+  </div>
+</div>
+</body>
+</html>

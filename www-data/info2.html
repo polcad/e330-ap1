@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Dictador software radio</title>
+	<meta charset="utf-8">
+	<meta name="author" content="polcad">
+	<meta name="description" content="Dictador software radio"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="css/reset.css">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+</head>
+<body>
+
+	<header>
+		<div class="logo">
+			<a href="index.html"><img src="img/dictador-logo.png" title="Dictador" alt="Dictador"/></a>
+		</div><!-- end logo -->
+
+		<div id="menu_icon"></div>
+		<nav>
+			<ul>
+				<li><a href="index.html">Home</a></li>
+				<li><a href="help.html">Help</a></li>
+				<li><a href="info.html" class="selected">My System</a></li>
+			</ul>
+		</nav><!-- end navigation menu -->
+
+		<div class="footer clearfix">
+
+			<div class="rights">
+				<p>Copyright © 2014 Dictador.</p>
+			</div><!-- end rights -->
+		</div ><!-- end footer -->
+	</header><!-- end header -->
+
+	<section class="main clearfix">
+
+		<section class="top">	
+			<div class="wrapper content_header clearfix">
+				<div class="work_nav">
+							
+					<ul class="btn clearfix">
+						<li><a href="info.html" class="previous" data-title="Previous"></a></li>
+						<li><a href="info2.html" class="grid" data-title="Info"></a></li>
+						<li><a href="info2.html" class="next" data-title="Next"></a></li>
+					</ul>							
+					
+				</div><!-- end work_nav -->
+				<h1 class="title">Description of your system's web interface.</h1>
+			</div>		
+		</section><!-- end top -->
+
+		<section class="wrapper">
+			<div class="content">
+				<p>To access the system's web interface start a web browser. Firefox is usually installed by default with every system. Then point your web browser to localhost</p>
+
+
+				<h3>runobts.sh</h3>
+
+				<p>Execute this command to start OpenBTS system. The command will: <br />- initialize hardware. Your radio board ie. USRP will be autodetected and initialized with appropriate firmware. You should see the type of your main board and the type of your radio doughterboard. <br />- start a deamon that listens to events reported by Asterisk and puts them into a database. You can then browse the events in real time from your web browser by navigating to the "Events Monitor" page. <br />- open separate terminal windows for smqueue and sipauthserve programs. There is normally not much to see here if your system is running correctly. All logging is done to syslog. <br />- open a separate terinal window for AsteriskCLI. You will see some log messages of Asterisk PBX in this window. A lot of these messages will also be reported by "Events Monitor" page in your web browser. <br />- open OpenBTSCLI in a separate terminal window. From this window you can manage your OpenBTS configuration database, monitor the system, send text messages to regeistered handsets etc... <br />- start the OpenBTS application in a separate termina window. You can see the application logs here and error messages. The script will attempt to restart OpenBTS in case it crashes. Do not run this script as root. The script will ask for root privileges if necessary.</p>
+				<p>Using the script: ./runobts.sh</p>
+
+				<h3>btsonly.sh</h3>
+
+				<p>This script will attempt to start OpenBTS if it crashed. No other applications will be started with this script. It is provided only as a debug script.</p>
+				<p>Using the script: ./btsonly.sh</p>
+
+				<h3>scan900.sh</h3>
+
+				<p>This script will run an application that will scan GSM 900 band for basestations in range. ARFCN number and power will be reported. This script is also commonly used to check the deviation of your system frequency from the frequency of BTS stations in range. The script works with UHD compatible devices unless your system was installed for use with other type of device.</p>
+				<p>Using the script: ./scan900.sh</p>
+
+				<h3>scan1800.sh</h3>
+
+				<p>This script will run an application that will scan GSM 1800 band for basestations in range. ARFCN number and power will be reported. This script is also commonly used to check the deviation of your system frequency from the frequency of BTS stations in range. The script works with UHD compatible devices unless your system was installed for other type of device.</p>
+				<p>Using the script: ./scan1800.sh</p>
+
+				<h3>dissect.sh</h3>
+
+				<p>Run this script to start tshark capture of gsmtap on local interface. The output will be written to "arfcn-cap.xml" file in your tmp directory. OpenBTS or another application has to be configured to output gsmtap packets to local ethernet interface. Normally it is not advised to run this script as root user. <br />Check /tmp/arfcn-cap.xml file for the captured output.</p>
+				<p>Using the script: ./dissect.sh</p>
+
+				<h3>openbtsext.py</h3>
+
+				<p>Description:<br />
+   Script is used to manage the database, which is used by OpenBTS and Asterisk
+   to map VoIP extension to dial extension. Database is located in: /var/lib/asterisk/sqlite3dir/sqlite3.db<br /><br />
+
+Using the script:<br />
+   Listing of all database records, or a specific record<br />
+      ./openbtsext.py show all<br />
+      ./openbtsext.py show "<exten> <br /><br />
+
+   Adding a nr<br />
+      ./openbtsext.py insert <exten> <dial><br /><br />
+
+   Deleting a nr<br />
+      ./openbtsext.py delete <exten></p>
+
+				<h3>openbtsconf.py</h3>
+
+				<p>Description:<br />
+   Script is used to manage the OpenBTS configuration database located usually in /etc/OpenBTS/OpenBTS.db<br />Because of the permitions to the database location, the script has to be run as root.<br />
+Using the script:<br />
+   To display all config keys, or a specific key:<br />
+      sudo ./openbtsconf.py show all<br />
+      sudo ./openbtsconf.py show cellid<br />
+      sudo ./openbtsconf.py show <KEYSTRING> <br /><br />
+
+   To set a key value:<br />
+      sudo ./openbtsconf.py set cellid <MCC MNC LAC CI ShortName ARFCN Band> <br />
+
+      i.e. sudo ./openbtsconf.py set cellid 232 01 17161 12 A1 58 900<br />
+
+      sudo ./openbtsconf.py set <KEYSTRING> <VALUESTRING> <br />
+
+      i.e. sudo ./openbtsconf.py set GSM.Radio.C0 58<br />
+
+      Supported GSM bands are 900 and 1800</p>
+
+
+			</div><!-- end content -->
+		</section>
+	</section><!-- end main -->
+	
+</body>
+</html>
