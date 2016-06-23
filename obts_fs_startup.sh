@@ -5,7 +5,7 @@
 
 #get sudo privileges
 sudo echo 
-python $HOME/bin/events/proxyman/ProxyMan.py
+python $HOME/bin/e330-ap1/www-data/events/proxyman/ProxyMan.py
 
 #store FreeSWITCH and OpenBTS root locations
 OBTS_ROOT="$HOME/openbts"
