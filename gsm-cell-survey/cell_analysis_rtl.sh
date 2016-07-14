@@ -33,6 +33,7 @@ cellscan="cellscan.csv"
 BANDAS=GSM900
 PPM=58
 GAIN=40
+TR=60
 # RUTA de FICHEROS DE SALIDA
 SCRIPTDIR="$( cd "$( /usr/bin/dirname "$0" )" && pwd )"
 # X11 Display (airprobe)
@@ -93,19 +94,25 @@ then
 		freq_base=`echo ${freq_tmp}00000`
 		signo=`echo "${linea}" | awk '{print $4}'`
 		offset=`echo "${linea}" | awk '{print $5}' | sed 's/power://g'| sed 's/)//g'| sed 's/kHz//g' | sed 's/Hz//g' |sed 's/\.//g'`
-		freq_final=`echo $[${freq_base} ${signo} ${offset}]`
-		#freq_final=`echo $[${freq_base}]`
+		#freq_final=`echo $[${freq_base} ${signo} ${offset}]`
+		freq_final=`echo $[${freq_base}]`
 		num_chan=0
-
-		"${TSHARKBIN}" -i lo -a duration:10 -w /tmp/tshark_${arfcn}.pcap > /dev/null 2>&1 &
+		
+		echo "Starting tshark..."
+		"${TSHARKBIN}" -i lo -a duration:$TR -w /tmp/tshark_${arfcn}.pcap > /dev/null 2>&1 &
+		echo "tshark started."
+		cd ${GSMRECPATH} > /dev/null 2>&1
+		#./gsm_receive_rtl.py -s 1e6 -f ${freq_final} -g 42 > /dev/null 2>&1 &
+		echo "starting airprobe ..."
+		./airprobe_rtlsdr.py -s 2e6 -g $GAIN -p $PPM -f ${freq_final}  > /dev/null 2>&1 &
+		echo "airprobe started."
 		echo "Processing ARFCN nr: ${arfcn}"
 		echo "freq_tmp = ${freq_tmp}"
 		echo "offset =  ${signo}${offset}"
 		echo "freq_final = ${freq_final}"
-		cd ${GSMRECPATH} > /dev/null 2>&1
-		#./gsm_receive_rtl.py -s 1e6 -f ${freq_final} -g 42 > /dev/null 2>&1 &
-		./airprobe_rtlsdr.py -s 2e6 -g $GAIN -p $PPM -f ${freq_final}  > /dev/null 2>&1 &
-        	sleep 20
+
+        	sleep $TR
+		echo "finished sleep."
 		disown
 		kill -9 $! > /dev/null
 		cd - > /dev/null 2>&1
